@@ -1,8 +1,9 @@
 package com.example.githubusersbyazim.repository
 
 import com.example.githubusersbyazim.api.FetchAPI
-import com.example.githubusersbyazim.model.UserDetailsModel
-import com.example.githubusersbyazim.model.Users
+import com.example.githubusersbyazim.model.followers.Followers
+import com.example.githubusersbyazim.model.userDetails.UserDetailsModel
+import com.example.githubusersbyazim.model.users.Users
 import com.example.githubusersbyazim.roomdb.UserEntity
 import com.example.githubusersbyazim.roomdb.UsersDAO
 import com.example.githubusersbyazim.roomdb.UsersEntity
@@ -33,4 +34,6 @@ class RepositoryImpl @Inject constructor(private val fetchAPI: FetchAPI, private
     override fun getSearchedUsersFromDB(): Flow<UserEntity> =
         usersDAO.readSearchedUsersFromDb()
 
+    override suspend fun getFollowersFromAPI(username: String): Response<Followers> =
+        fetchAPI.getFollowers(username)
 }

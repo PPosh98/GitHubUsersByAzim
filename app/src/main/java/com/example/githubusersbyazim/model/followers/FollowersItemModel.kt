@@ -1,9 +1,9 @@
-package com.example.githubusersbyazim.model
+package com.example.githubusersbyazim.model.followers
 
 
 import com.google.gson.annotations.SerializedName
 
-data class UsersItemModel(
+data class FollowersItemModel(
     @SerializedName("avatar_url")
     val avatarUrl: String,
     @SerializedName("events_url")

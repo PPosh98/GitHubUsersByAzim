@@ -1,75 +1,69 @@
 package com.example.githubusersbyazim.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import com.example.githubusersbyazim.model.UserDetailsModel
-import com.example.githubusersbyazim.model.Users
+import androidx.lifecycle.viewModelScope
+import com.example.githubusersbyazim.model.followers.Followers
+import com.example.githubusersbyazim.model.userDetails.UserDetailsModel
+import com.example.githubusersbyazim.model.users.Users
 import com.example.githubusersbyazim.repository.Repository
 import com.example.githubusersbyazim.roomdb.UserEntity
 import com.example.githubusersbyazim.roomdb.UsersEntity
-import com.example.githubusersbyazim.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class UsersViewModel @Inject constructor(private val repository: Repository): ViewModel() {
 
-    private var _usersLiveData: MutableLiveData<UiState> = MutableLiveData(UiState.Loading)
-    val usersLiveData: LiveData<UiState> get() = _usersLiveData
+    val usersApiData: MutableState<Users> = mutableStateOf(Users())
+    val userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
+    val followersApiData: MutableState<Followers> = mutableStateOf(Followers())
 
-    val readDefaultUsers: LiveData<UsersEntity> = repository.getDefaultUsersFromDB().asLiveData()
+    private val _searchTextState: MutableState<String> =
+        mutableStateOf(value = "")
+    val searchTextState: State<String> = _searchTextState
+
+    fun updateSearchTextState(newValue: String) {
+        _searchTextState.value = newValue
+    }
+
+    val readDefaultUsers = repository.getDefaultUsersFromDB()
 
     fun getDefaultUsers() {
-
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = repository.getDefaultUsersFromAPI()
-            if(response.isSuccessful){
-                _usersLiveData.postValue(
-                    response.body()?.let {
-                        if (response.body()!!.size > 0) addDefaultUsersToDB(it)
-                        UiState.Success(
-                            response.body() as Users
-                        )
-                    }
-                )
-            } else {
-                _usersLiveData.postValue(
-                    UiState.Error(
-                        Throwable(
-                            response.message()
-                        )
-                    )
-                )
+            if(response.isSuccessful) {
+                response.body()?.let {
+                    usersApiData.value = it
+                    addDefaultUsersToDB(it)
+                }
             }
         }
     }
 
     fun getSearchedUser(username: String) {
-
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = repository.getSearchedUserFromAPI(username)
-            if(response.isSuccessful){
-                _usersLiveData.postValue(
-                    response.body()?.let {
-                        if (response.body() != null) addSearchedUserToDB(it)
-                        UiState.Success(
-                            response.body() as Users
-                        )
-                    }
-                )
-            } else {
-                _usersLiveData.postValue(
-                    UiState.Error(
-                        Throwable(
-                            response.message()
-                        )
-                    )
-                )
+            if(response.isSuccessful) {
+                response.body()?.let {
+                    userDetailsApiData.value = it
+                }
+            }
+        }
+    }
+
+    fun getFollowers(username: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repository.getFollowersFromAPI(username)
+            response.body()?.let {
+                followersApiData.value = it
             }
         }
     }

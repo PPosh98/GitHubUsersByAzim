@@ -1,7 +1,11 @@
 package com.example.githubusersbyazim.roomdb
 
 import androidx.room.Entity
-import com.example.githubusersbyazim.model.Users
+import androidx.room.PrimaryKey
+import com.example.githubusersbyazim.model.users.Users
 
 @Entity(tableName = "users")
-class UsersEntity(val usersModel: Users)
+class UsersEntity(val usersModel: Users){
+    @PrimaryKey(autoGenerate = true)
+    var generatedId: Int = 0
+}
