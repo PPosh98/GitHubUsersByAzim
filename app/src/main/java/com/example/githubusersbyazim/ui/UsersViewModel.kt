@@ -31,8 +31,12 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
     }
 
     val usersApiData: MutableState<Users> = mutableStateOf(Users())
-    val userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
-    val followersApiData: MutableState<Followers> = mutableStateOf(Followers())
+
+    val _userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
+    val userDetailsApiData: State<UserDetailsModel> get() = _userDetailsApiData
+
+    val _followersApiData: MutableState<Followers> = mutableStateOf(Followers())
+    val followersApiData: State<Followers> get() = _followersApiData
 
     private val _searchTextState: MutableState<String> =
         mutableStateOf(value = "")
@@ -70,7 +74,7 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
             val response = repository.getSearchedUserFromAPI(username)
             if(response.isSuccessful) {
                 response.body()?.let {
-                    userDetailsApiData.value = it
+                    _userDetailsApiData.value = it
                 }
             }
         }
@@ -80,7 +84,7 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
         viewModelScope.launch(Dispatchers.IO) {
             val response = repository.getFollowersFromAPI(username)
             response.body()?.let {
-                followersApiData.value = it
+                _followersApiData.value = it
             }
         }
     }

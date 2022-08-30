@@ -12,18 +12,15 @@ import retrofit2.http.Path
 interface FetchAPI {
     @GET("users")
     suspend fun getUsers(
-        @Header("Authorization") token: String = TOKEN
     ) : Response<Users>
 
     @GET("users/{username}")
     suspend fun getUser(
-        @Path("username") username: String,
-        @Header("Authorization") token: String = TOKEN
+        @Path("username") username: String
     ) : Response<UserDetailsModel>
 
     @GET("users/{username}/followers")
     suspend fun getFollowers(
-        @Path("username") username: String,
-        @Header("Authorization") token: String = TOKEN
+        @Path("username") username: String
     ) : Response<Followers>
 }
