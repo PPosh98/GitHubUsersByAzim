@@ -6,6 +6,6 @@ import com.example.githubusersbyazim.model.users.Users
 
 @Entity(tableName = "users")
 class UsersEntity(val usersModel: Users){
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     var generatedId: Int = 0
 }

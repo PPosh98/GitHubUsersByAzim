@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.repository
 
+import androidx.lifecycle.LiveData
 import com.example.githubusersbyazim.api.FetchAPI
 import com.example.githubusersbyazim.model.followers.Followers
 import com.example.githubusersbyazim.model.userDetails.UserDetailsModel
@@ -19,7 +20,7 @@ class RepositoryImpl @Inject constructor(private val fetchAPI: FetchAPI, private
     override suspend fun addDefaultUsersToDB(usersEntity: UsersEntity) =
         usersDAO.insertDefaultUsersToDb(usersEntity)
 
-    override fun getDefaultUsersFromDB(): Flow<UsersEntity> =
+    override fun getDefaultUsersFromDB(): LiveData<UsersEntity> =
         usersDAO.readDefaultUsersFromDb()
 
     override suspend fun getSearchedUserFromAPI(username: String): Response<UserDetailsModel> =

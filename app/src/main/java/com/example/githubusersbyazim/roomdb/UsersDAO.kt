@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.roomdb
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -13,7 +14,7 @@ interface UsersDAO {
     fun insertDefaultUsersToDb(usersEntity: UsersEntity)
 
     @Query("SELECT * FROM users")
-    fun readDefaultUsersFromDb() : Flow<UsersEntity>
+    fun readDefaultUsersFromDb() : LiveData<UsersEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSearchedUserToDb(userEntity: UserEntity)

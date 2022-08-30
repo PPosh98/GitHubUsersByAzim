@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.ui
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -15,12 +16,17 @@ import com.example.githubusersbyazim.roomdb.UsersEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class UsersViewModel @Inject constructor(private val repository: Repository): ViewModel() {
+
+    init {
+        getDefaultUsers()
+    }
 
     val usersApiData: MutableState<Users> = mutableStateOf(Users())
     val userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
@@ -34,17 +40,24 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
         _searchTextState.value = newValue
     }
 
-    val readDefaultUsers = repository.getDefaultUsersFromDB()
-
     fun getDefaultUsers() {
+        val readDefaultUsers = repository.getDefaultUsersFromDB()
         viewModelScope.launch(Dispatchers.IO) {
-            val response = repository.getDefaultUsersFromAPI()
-            if(response.isSuccessful) {
-                response.body()?.let {
-                    usersApiData.value = it
-                    addDefaultUsersToDB(it)
+            delay(2000)
+            if (readDefaultUsers.value != null) {
+                Log.i("db", "data fetched from database!")
+                usersApiData.value = readDefaultUsers.value!!.usersModel
+            } else {
+                val response = repository.getDefaultUsersFromAPI()
+                Log.i("db", "data fetched from API!")
+                if(response.isSuccessful) {
+                    response.body()?.let {
+                        usersApiData.value = it
+                        addDefaultUsersToDB(it)
+                    }
                 }
             }
+
         }
     }
 

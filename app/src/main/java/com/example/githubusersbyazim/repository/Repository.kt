@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.repository
 
+import androidx.lifecycle.LiveData
 import com.example.githubusersbyazim.model.followers.Followers
 import com.example.githubusersbyazim.model.userDetails.UserDetailsModel
 import com.example.githubusersbyazim.model.users.Users
@@ -13,7 +14,7 @@ interface Repository {
 
     suspend fun addDefaultUsersToDB(usersEntity: UsersEntity)
 
-    fun getDefaultUsersFromDB() : Flow<UsersEntity>
+    fun getDefaultUsersFromDB() : LiveData<UsersEntity>
 
     suspend fun getSearchedUserFromAPI(username: String) : Response<UserDetailsModel>
 
