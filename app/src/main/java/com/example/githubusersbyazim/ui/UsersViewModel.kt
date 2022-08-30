@@ -5,6 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubusersbyazim.model.followers.Followers
@@ -13,6 +14,7 @@ import com.example.githubusersbyazim.model.users.Users
 import com.example.githubusersbyazim.repository.Repository
 import com.example.githubusersbyazim.roomdb.UserEntity
 import com.example.githubusersbyazim.roomdb.UsersEntity
+import com.example.githubusersbyazim.util.observeOnce
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,22 +44,24 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
 
     fun getDefaultUsers() {
         val readDefaultUsers = repository.getDefaultUsersFromDB()
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(2000)
-            if (readDefaultUsers.value != null) {
-                Log.i("db", "data fetched from database!")
-                usersApiData.value = readDefaultUsers.value!!.usersModel
-            } else {
-                val response = repository.getDefaultUsersFromAPI()
-                Log.i("db", "data fetched from API!")
-                if(response.isSuccessful) {
-                    response.body()?.let {
-                        usersApiData.value = it
-                        addDefaultUsersToDB(it)
+        viewModelScope.launch {
+            readDefaultUsers.observeForever{
+                if (readDefaultUsers.value != null) {
+                    Log.i("db", "data fetched from database!")
+                    usersApiData.value = readDefaultUsers.value!!.usersModel
+                } else {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val response = repository.getDefaultUsersFromAPI()
+                        Log.i("db", "data fetched from API!")
+                        if(response.isSuccessful) {
+                            response.body()?.let {
+                                usersApiData.value = it
+                                addDefaultUsersToDB(it)
+                            }
+                        }
                     }
                 }
             }
-
         }
     }
 
