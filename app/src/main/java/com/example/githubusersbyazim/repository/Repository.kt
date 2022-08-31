@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.repository
 
+import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
 import com.example.githubusersbyazim.model.followers.Followers
 import com.example.githubusersbyazim.model.userDetails.UserDetailsModel

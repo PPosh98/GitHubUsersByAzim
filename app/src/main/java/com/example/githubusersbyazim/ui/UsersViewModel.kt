@@ -26,16 +26,13 @@ import javax.inject.Inject
 @HiltViewModel
 class UsersViewModel @Inject constructor(private val repository: Repository): ViewModel() {
 
-    init {
-        getDefaultUsers()
-    }
+    private val _usersData: MutableState<Users> = mutableStateOf(Users())
+    val usersData: State<Users> get() = _usersData
 
-    val usersApiData: MutableState<Users> = mutableStateOf(Users())
-
-    val _userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
+    private val _userDetailsApiData: MutableState<UserDetailsModel> = mutableStateOf(UserDetailsModel())
     val userDetailsApiData: State<UserDetailsModel> get() = _userDetailsApiData
 
-    val _followersApiData: MutableState<Followers> = mutableStateOf(Followers())
+    private val _followersApiData: MutableState<Followers> = mutableStateOf(Followers())
     val followersApiData: State<Followers> get() = _followersApiData
 
     private val _searchTextState: MutableState<String> =
@@ -47,24 +44,19 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
     }
 
     fun getDefaultUsers() {
-        val readDefaultUsers = repository.getDefaultUsersFromDB()
-        viewModelScope.launch {
-            readDefaultUsers.observeForever{
-                if (readDefaultUsers.value != null) {
-                    Log.i("db", "data fetched from database!")
-                    usersApiData.value = readDefaultUsers.value!!.usersModel
-                } else {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        val response = repository.getDefaultUsersFromAPI()
-                        Log.i("db", "data fetched from API!")
-                        if(response.isSuccessful) {
-                            response.body()?.let {
-                                usersApiData.value = it
-                                addDefaultUsersToDB(it)
-                            }
-                        }
+        viewModelScope.launch(Dispatchers.IO) {
+            if (repository.getDefaultUsersFromDB().value?.usersModel?.isEmpty() == true) {
+                val response = repository.getDefaultUsersFromAPI()
+                Log.i("data", "data fetched from API!")
+                if(response.isSuccessful) {
+                    response.body()?.let {
+                        _usersData.value = it
+                        addDefaultUsersToDB(it)
                     }
                 }
+            } else {
+                Log.i("data", "data fetched from Database!")
+                _usersData.value = repository.getDefaultUsersFromDB().value?.usersModel!!
             }
         }
     }
