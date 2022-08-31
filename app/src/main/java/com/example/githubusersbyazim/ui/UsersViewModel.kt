@@ -51,6 +51,7 @@ class UsersViewModel @Inject constructor(private val repository: Repository): Vi
             if(response.isSuccessful) {
                 response.body()?.let {
                     _usersAPIData.value = it
+                    Log.i("data", "API: ${it[0].login}")
                     addDefaultUsersToDB(it)
                 }
             }

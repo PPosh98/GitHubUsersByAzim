@@ -46,6 +46,7 @@ fun UsersListScreen(
         viewModel.getDefaultUsers()
         listOfUsers = apiUsers
     } else {
+        Log.i("data", "DB: ${dbUsers!!.usersModel[0].login}")
         Log.i("data", "fetched data from DB")
         listOfUsers = dbUsers!!.usersModel
     }
