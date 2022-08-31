@@ -15,7 +15,7 @@ interface Repository {
 
     suspend fun addDefaultUsersToDB(usersEntity: UsersEntity)
 
-    fun getDefaultUsersFromDB() : LiveData<UsersEntity>
+    fun getDefaultUsersFromDB() : Flow<UsersEntity>
 
     suspend fun getSearchedUserFromAPI(username: String) : Response<UserDetailsModel>
 

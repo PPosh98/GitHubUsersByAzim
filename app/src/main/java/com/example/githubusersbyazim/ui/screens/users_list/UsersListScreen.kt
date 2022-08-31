@@ -1,5 +1,6 @@
 package com.example.githubusersbyazim.ui.screens.users_list
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,8 +11,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,8 +38,17 @@ fun UsersListScreen(
     onSearchClicked: (String) -> Unit
 ) {
 
-    viewModel.getDefaultUsers()
-    val listOfUsers = remember {viewModel.usersData.value}
+    var listOfUsers: Users
+    val dbUsers by viewModel.readUsersFromDB.observeAsState()
+    val apiUsers by remember {viewModel.usersAPIData}
+
+    if (dbUsers?.usersModel == null) {
+        viewModel.getDefaultUsers()
+        listOfUsers = apiUsers
+    } else {
+        Log.i("data", "fetched data from DB")
+        listOfUsers = dbUsers!!.usersModel
+    }
 
     Scaffold(
         topBar = {

@@ -21,7 +21,7 @@ class RepositoryImpl @Inject constructor(private val fetchAPI: FetchAPI, private
     override suspend fun addDefaultUsersToDB(usersEntity: UsersEntity) =
         usersDAO.insertDefaultUsersToDb(usersEntity)
 
-    override fun getDefaultUsersFromDB(): LiveData<UsersEntity> =
+    override fun getDefaultUsersFromDB(): Flow<UsersEntity> =
         usersDAO.readDefaultUsersFromDb()
 
     override suspend fun getSearchedUserFromAPI(username: String): Response<UserDetailsModel> =

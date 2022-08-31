@@ -15,7 +15,7 @@ interface UsersDAO {
     fun insertDefaultUsersToDb(usersEntity: UsersEntity)
 
     @Query("SELECT * FROM users")
-    fun readDefaultUsersFromDb() : LiveData<UsersEntity>
+    fun readDefaultUsersFromDb() : Flow<UsersEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSearchedUserToDb(userEntity: UserEntity)

@@ -13,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,8 +38,8 @@ fun UserDetailsScreen(
     viewModel.getSearchedUser(username)
     viewModel.getFollowers(username)
 
-    val userDetails = remember {viewModel.userDetailsApiData.value}
-    val followers = remember {viewModel.followersApiData.value}
+    val userDetails by remember {viewModel.userDetailsApiData}
+    val followers by remember {viewModel.followersApiData}
 
     Column {
         UserIntro(userDetails)
