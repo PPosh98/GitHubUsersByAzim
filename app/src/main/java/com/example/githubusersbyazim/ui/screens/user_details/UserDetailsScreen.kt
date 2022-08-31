@@ -1,6 +1,7 @@
 package com.example.githubusersbyazim.ui.screens.user_details
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -8,10 +9,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,25 +27,48 @@ import coil.request.ImageRequest
 import com.example.githubusersbyazim.model.followers.Followers
 import com.example.githubusersbyazim.model.userDetails.UserDetailsModel
 import com.example.githubusersbyazim.ui.UsersViewModel
+import com.example.githubusersbyazim.ui.screens.users_list.SearchBar
+import com.example.githubusersbyazim.ui.screens.users_list.UsersList
 
 @Composable
 fun UserDetailsScreen(
     username: String = "",
     viewModel: UsersViewModel = hiltViewModel(),
-    onNavigateToFollower: (String) -> Unit
+    onNavigateToFollower: (String) -> Unit,
+    onNavigateBack: () -> Unit
 ) {
 
-    viewModel.getSearchedUser(username)
-    viewModel.getFollowers(username)
+//    viewModel.getSearchedUser(username)
+//    viewModel.getFollowers(username)
 
     val userDetails by remember {viewModel.userDetailsApiData}
     val followers by remember {viewModel.followersApiData}
 
-    Column {
-        UserIntro(userDetails)
-        UserDetails(userDetails)
-        FollowersSection(followers, onNavigateToFollower)
+    Scaffold(
+        topBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colors.primary
+            ) {
+                Row {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                        )
+                    }
+                }
+            }
+        }
+    ) { padding ->
+        Column {
+            UserIntro(userDetails)
+            UserDetails(userDetails)
+            FollowersSection(followers, onNavigateToFollower)
+        }
     }
+
+
 }
 
 @Composable

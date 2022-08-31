@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,9 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -33,7 +37,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Navigation() {
+fun Navigation(viewModel: UsersViewModel = hiltViewModel()) {
+
     val navController = rememberNavController()
 
     val arguments = listOf(
@@ -43,12 +48,16 @@ fun Navigation() {
     NavHost(navController = navController, startDestination = "usersList") {
         composable("usersList") {
             UsersListScreen(
-                onNavigateToDetails = { username -> navController.navigate("userDetails/$username")},
+                onNavigateToDetails = { username ->
+                    viewModel.getSearchedUser(username)
+                    viewModel.getFollowers(username)
+                    navController.navigate("userDetails/$username") },
                 onSearchClicked = { username -> navController.navigate("userDetails/$username")}
             ) }
         composable("usersDetails") {
             UserDetailsScreen(
-                onNavigateToFollower = { username -> navController.navigate("userDetails/$username") }
+                onNavigateToFollower = { username -> navController.navigate("userDetails/$username") },
+                onNavigateBack = {}
             ) }
         composable(
             route = "userDetails/{username}",
@@ -59,7 +68,8 @@ fun Navigation() {
             if (username != null) {
                 UserDetailsScreen(
                     username = username,
-                    onNavigateToFollower = {}
+                    onNavigateToFollower = {navController.navigate("userDetails/$username")},
+                    onNavigateBack = {navController.navigate("usersList")}
                 )
             }
         }
